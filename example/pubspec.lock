@@ -251,10 +251,9 @@ packages:
   share_image_whatsapp:
     dependency: "direct main"
     description:
-      name: share_image_whatsapp
-      sha256: "49d18e779a6ecc35308102253db5b647cdffc47b44c6835043051ec60422c984"
-      url: "https://pub.dev"
-    source: hosted
+      path: ".."
+      relative: true
+    source: path
     version: "1.0.3"
   sky_engine:
     dependency: transitive

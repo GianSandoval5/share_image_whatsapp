@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/services.dart';
@@ -87,10 +85,11 @@ class _MyAppState extends State<MyApp> {
               title: const Text('Share QR Code'),
               trailing: const Icon(Icons.share),
               onTap: () async {
+                String numero = '930 236 995';// Reemplaza con el número real
                 // Usar el nuevo helper para compartir QR
                 final success = await QRWhatsAppHelper.sendQRToWhatsApp(
-                  mensaje: "HOLA PROBANDO COMPARTIR QR",
-                  phone: '971562873', // Reemplaza con el número real
+                  mensaje: "HOLA PROBANDO COMPARTIR QR - probando desde el package",
+                  phone: numero, // Reemplaza con el número real
                   qrKey: _qrKey,
                 );
 
