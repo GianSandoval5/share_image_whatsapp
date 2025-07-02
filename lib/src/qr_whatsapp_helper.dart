@@ -3,10 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:path_provider/path_provider.dart';
-
-import '../share_whatsapp.dart';
+import 'package:share_image_whatsapp/share_image_whatsapp.dart';
 
 /// Helper class for sharing QR codes specifically to WhatsApp
 class QRWhatsAppHelper {

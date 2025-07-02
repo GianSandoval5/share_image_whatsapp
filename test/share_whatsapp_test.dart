@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/share_whatsapp.dart';
+import '../lib/share_image_whatsapp.dart';
 import '../lib/share_whatsapp_platform_interface.dart';
 import '../lib/share_whatsapp_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';

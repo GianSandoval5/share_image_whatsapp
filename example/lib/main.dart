@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/services.dart';
-import 'package:share_image_whatsapp/share_whatsapp.dart';
+import 'package:share_image_whatsapp/share_image_whatsapp.dart';
 
 void main() {
   runApp(const MyApp());
