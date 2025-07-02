@@ -23,7 +23,7 @@ Agrega este paquete a tu `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  share_image_whatsapp: ^1.0.2
+  share_image_whatsapp: ^1.0.5
 ```
 
 Luego ejecuta:
