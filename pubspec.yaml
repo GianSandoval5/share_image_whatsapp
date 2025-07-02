@@ -1,6 +1,6 @@
 name: share_image_whatsapp
 description: "Un potente plugin de Flutter para compartir texto, imágenes y códigos QR directamente a WhatsApp. Soporta WhatsApp Business y múltiples plataformas con capacidades de envío directo a números específicos."
-version: 1.0.3
+version: 1.0.4
 homepage: https://github.com/GianSandoval5/share_image_whatsapp
 repository: https://github.com/GianSandoval5/share_image_whatsapp
 issue_tracker: https://github.com/GianSandoval5/share_image_whatsapp/issues
