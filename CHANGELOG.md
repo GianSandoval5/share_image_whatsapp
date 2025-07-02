@@ -1,3 +1,13 @@
+## 1.0.5
+
+* Mejorado procesamiento inteligente de números telefónicos con múltiples formatos
+* Agregado sistema de prueba automática con formatos alternativos (+51, 51, local)
+* Mejorado logging detallado para debugging y seguimiento de formatos
+* Corregido manejo de números con prefijos (051, 1 inicial extra)
+* Agregado método sendQRToWhatsAppGeneral para selección libre de contactos
+* Mejorada documentación sobre comportamiento de selección de contactos en WhatsApp
+* Optimizada lógica de reintentos por formato antes de fallar
+
 ## 1.0.4
 
 * Mejorado QRWhatsAppHelper con manejo robusto de errores
