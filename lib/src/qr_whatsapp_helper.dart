@@ -13,6 +13,7 @@ class QRWhatsAppHelper {
     required String phone,
     required GlobalKey qrKey,
     int maxRetries = 3,
+    WhatsApp whatsAppType = WhatsApp.standard,
   }) async {
     // Validaciones iniciales
     if (phone.trim().isEmpty) {
@@ -28,6 +29,10 @@ class QRWhatsAppHelper {
     // Limpiar el número de teléfono (remover espacios, caracteres especiales)
     String cleanPhone = _cleanPhoneNumber(phone);
     debugPrint('Teléfono limpio: $cleanPhone');
+
+    // Generar formatos alternativos para probar
+    List<String> phoneFormats = _generatePhoneFormats(cleanPhone);
+    debugPrint('Formatos a probar: $phoneFormats');
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -49,12 +54,30 @@ class QRWhatsAppHelper {
           continue;
         }
 
-        // Intentar enviar a WhatsApp
-        bool success = await _sendToWhatsApp(
-          imagePath: imagePath,
-          message: mensaje,
-          phone: cleanPhone,
-        );
+        // Probar con diferentes formatos de número
+        bool success = false;
+        for (int formatIndex = 0; formatIndex < phoneFormats.length; formatIndex++) {
+          String phoneToTry = phoneFormats[formatIndex];
+          debugPrint('Probando formato ${formatIndex + 1}/${phoneFormats.length}: $phoneToTry');
+          
+          success = await _sendToWhatsApp(
+            imagePath: imagePath,
+            message: mensaje,
+            phone: phoneToTry,
+            whatsAppType: whatsAppType,
+          );
+          
+          if (success) {
+            debugPrint('¡Éxito con formato: $phoneToTry!');
+            break;
+          } else {
+            debugPrint('Falló formato: $phoneToTry');
+            // Esperar un poco antes del siguiente formato
+            if (formatIndex < phoneFormats.length - 1) {
+              await Future.delayed(Duration(milliseconds: 300));
+            }
+          }
+        }
 
         // Limpiar archivo temporal
         await _cleanupTemporaryFile(imagePath);
@@ -63,7 +86,7 @@ class QRWhatsAppHelper {
           debugPrint('QR enviado exitosamente en intento $attempt');
           return true;
         } else {
-          debugPrint('Falló el envío en intento $attempt');
+          debugPrint('Fallaron todos los formatos en intento $attempt');
           if (attempt < maxRetries) {
             // Esperar antes del siguiente intento
             await Future.delayed(Duration(milliseconds: 500 * attempt));
@@ -85,15 +108,37 @@ class QRWhatsAppHelper {
     // Remover espacios, guiones, paréntesis, etc.
     String cleaned = phone.replaceAll(RegExp(r'[^0-9]'), '');
     
-    // Si empieza con código de país, asegurar que esté bien formateado
-    if (cleaned.startsWith('51') && cleaned.length > 9) {
-      // Para Perú, mantener el formato con código de país
+    debugPrint('Número original: $phone');
+    debugPrint('Número limpio: $cleaned');
+    
+    // Manejar diferentes casos de números peruanos
+    if (cleaned.length == 9) {
+      // Número de 9 dígitos (formato local peruano)
+      // Agregar código de país 51
+      String result = '51$cleaned';
+      debugPrint('Número con código país: $result');
+      return result;
+    } else if (cleaned.length == 11 && cleaned.startsWith('51')) {
+      // Ya tiene código de país 51
+      debugPrint('Número ya tiene código país: $cleaned');
       return cleaned;
-    } else if (cleaned.length == 9) {
-      // Si es solo el número sin código de país, agregar 51 para Perú
-      return '51$cleaned';
+    } else if (cleaned.length == 12 && cleaned.startsWith('051')) {
+      // Formato 051XXXXXXXXX, remover el 0 inicial
+      String result = cleaned.substring(1);
+      debugPrint('Removido 0 inicial: $result');
+      return result;
+    } else if (cleaned.length == 10 && cleaned.startsWith('1')) {
+      // Posible número con 1 inicial extra
+      String withoutOne = cleaned.substring(1);
+      if (withoutOne.length == 9) {
+        String result = '51$withoutOne';
+        debugPrint('Removido 1 inicial, agregado código país: $result');
+        return result;
+      }
     }
     
+    // Si no coincide con ningún patrón conocido, devolver tal como está
+    debugPrint('Número no reconocido, devolviendo: $cleaned');
     return cleaned;
   }
 
@@ -133,6 +178,7 @@ class QRWhatsAppHelper {
     required String imagePath,
     required String message,
     required String phone,
+    WhatsApp whatsAppType = WhatsApp.standard,
   }) async {
     try {
       debugPrint('Enviando a WhatsApp - Teléfono: $phone, Mensaje: $message');
@@ -145,7 +191,7 @@ class QRWhatsAppHelper {
         file: XFile(imagePath),
         phone: phone,
         text: message,
-        type: WhatsApp.standard, // Cambiar a WhatsApp.business si es necesario
+        type: whatsAppType, // Cambiar a WhatsApp.business si es necesario
       );
       
       debugPrint('Resultado del envío: $result');
@@ -167,5 +213,32 @@ class QRWhatsAppHelper {
     } catch (e) {
       debugPrint('Error eliminando archivo temporal: $e');
     }
+  }
+
+  /// Genera diferentes formatos de número para probar
+  static List<String> _generatePhoneFormats(String cleanPhone) {
+    List<String> formats = [];
+    
+    // Agregar el formato principal
+    formats.add(cleanPhone);
+    
+    // Si el número tiene 11 dígitos y empieza con 51
+    if (cleanPhone.length == 11 && cleanPhone.startsWith('51')) {
+      String localNumber = cleanPhone.substring(2); // Remover 51
+      
+      // Agregar formatos alternativos
+      formats.add('+$cleanPhone');           // +51XXXXXXXXX
+      formats.add(localNumber);              // XXXXXXXXX (solo local)
+      formats.add('+51$localNumber');        // +51XXXXXXXXX (redundante pero por si acaso)
+    }
+    
+    // Si el número tiene 9 dígitos (formato local)
+    if (cleanPhone.length == 9) {
+      formats.add('+51$cleanPhone');         // +51XXXXXXXXX
+      formats.add('51$cleanPhone');          // 51XXXXXXXXX
+    }
+    
+    // Remover duplicados manteniendo el orden
+    return formats.toSet().toList();
   }
 }

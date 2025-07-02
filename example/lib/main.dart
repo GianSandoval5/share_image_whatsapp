@@ -15,6 +15,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: _HomePage(),
+    );
+  }
+}
+
+class _HomePage extends StatefulWidget {
+  @override
+  State<_HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<_HomePage> {
   final _mapInstalled = WhatsApp.values.asMap().map<WhatsApp, String?>((
     key,
     value,
@@ -53,72 +67,73 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Share WhatsApp Example')),
-        body: Column(
-          children: [
-            SizedBox(
-              width: 250,
-              height: 250,
-              child: RepaintBoundary(
-                key: _qrKey,
-                child: Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(10),
-                  child: QrImageView(
-                    data:
-                        "https://cdn.pixabay.com/photo/2012/04/13/01/23/moon-31665_1280.png",
-                    version: QrVersions.auto,
-                    size: 200.0,
-                    backgroundColor: Colors.white,
-                    //foregroundColor: colorAzulClaro,
-                    embeddedImage: AssetImage(''),
-                    embeddedImageStyle: const QrEmbeddedImageStyle(
-                      size: Size(40, 40),
-                    ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Share WhatsApp Example')),
+      body: Column(
+        children: [
+          SizedBox(
+            width: 250,
+            height: 250,
+            child: RepaintBoundary(
+              key: _qrKey,
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(10),
+                child: QrImageView(
+                  data:
+                      "https://cdn.pixabay.com/photo/2012/04/13/01/23/moon-31665_1280.png",
+                  version: QrVersions.auto,
+                  size: 200.0,
+                  backgroundColor: Colors.white,
+                  embeddedImage: AssetImage(''),
+                  embeddedImageStyle: const QrEmbeddedImageStyle(
+                    size: Size(40, 40),
                   ),
                 ),
               ),
             ),
-            ListTile(
-              title: const Text('Share QR Code'),
-              trailing: const Icon(Icons.share),
-              onTap: () async {
-                String numero = '930 236 995';// Reemplaza con el número real
-                // Usar el nuevo helper para compartir QR
-                final success = await QRWhatsAppHelper.sendQRToWhatsApp(
-                  mensaje: "HOLA PROBANDO COMPARTIR QR - probando desde el package",
-                  phone: numero, // Reemplaza con el número real
-                  qrKey: _qrKey,
-                );
-
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? 'QR compartido exitosamente'
-                            : 'Error al compartir QR',
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-            const ListTile(title: Text('STATUS INSTALLATION')),
-            ...WhatsApp.values.map((type) {
-              final status = _mapInstalled[type];
-
-              return ListTile(
-                title: Text(type.toString()),
-                trailing: status != null
-                    ? Text(status)
-                    : const CircularProgressIndicator.adaptive(),
+          ),
+          ListTile(
+            title: const Text('Share QR Code'),
+            trailing: const Icon(Icons.share),
+            onTap: () async {
+              String numero = '984505564'; // Reemplaza con el número real
+              // Usar el nuevo helper para compartir QR
+              final success = await QRWhatsAppHelper.sendQRToWhatsApp(
+                mensaje: "HOLA PROBANDO COMPARTIR QR - probando desde el package",
+                phone: numero,
+                qrKey: _qrKey,
               );
-            }),
-          ],
-        ),
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'QR compartido exitosamente'
+                          : 'Error al compartir QR',
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          const Divider(),
+          const ListTile(
+            title: Text('ℹ️ Información'),
+            subtitle: Text('Si el número no está en tus contactos, WhatsApp pedirá seleccionar contacto. Esto es normal y esperado.'),
+          ),
+          const ListTile(title: Text('STATUS INSTALLATION')),
+          ...WhatsApp.values.map((type) {
+            final status = _mapInstalled[type];
+
+            return ListTile(
+              title: Text(type.toString()),
+              trailing: status != null
+                  ? Text(status)
+                  : const CircularProgressIndicator.adaptive(),
+            );
+          }),
+        ],
       ),
     );
   }
